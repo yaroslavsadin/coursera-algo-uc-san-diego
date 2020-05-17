@@ -1,7 +1,7 @@
-.o
-.exe
-.out
-.elf
-.zip
-.7z
-.pdf
+*.o
+*.exe
+*.out
+*.elf
+*.zip
+*.7z
+*.pdf
