@@ -1,7 +1,8 @@
 {
     "terminal.integrated.env.windows": {
         "PATH":"C:\\cygwin64\\bin;C:\\Javalib;C:\\Windows\\System32;C:\\Program Files\\Java\\jdk1.7.0_80\\bin",
-        "MAKEFLAGS":"--no-print-directory"
+        "MAKEFLAGS":"--no-print-directory",
+        "WORKSPACE_ROOT":"${workspaceFolder}"
     },
     "files.associations": {
         "algorithm": "cpp",
@@ -51,6 +52,14 @@
         "tuple": "cpp",
         "unordered_map": "cpp",
         "xfunctional": "cpp",
-        "xhash": "cpp"
+        "xhash": "cpp",
+        "array": "cpp",
+        "chrono": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "ratio": "cpp",
+        "set": "cpp",
+        "xtree": "cpp",
+        "numeric": "cpp"
     }
 }
