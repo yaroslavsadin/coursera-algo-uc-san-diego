@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using std::cin;
 using std::cout;
@@ -8,7 +9,25 @@ using std::max;
 
 int compute_min_refills(int dist, int tank, vector<int> & stops) {
     // write your code here
-    return -1;
+    if(!stops.size() || stops[0] > tank) {
+        return -1;
+    }
+    int res = 0;
+    int current_station = 0;
+    for(auto it = std::lower_bound(stops.begin(),stops.end(),tank); 
+        current_station + tank < dist;
+        it = std::lower_bound(it,stops.end(),current_station + tank), res++
+    ) {
+        if(*it == current_station + tank) {
+            current_station = *it;
+        } else if(current_station != *prev(it) && *prev(it) <= current_station + tank) {
+            current_station = *prev(it);
+        } else {
+            return -1;
+        }
+    }
+
+    return res;
 }
 
 
