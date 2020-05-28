@@ -7,6 +7,7 @@
 #include <cmath>
 #include <sstream>
 #include <cassert>
+#include <iomanip>
 
 using std::vector;
 
@@ -93,10 +94,19 @@ vector<int> optimal_points_attempt_1(vector<Segment> segments) {
   return points;
 }
 
-vector<int> optimal_points_attempt_2(const vector<Segment> &segments) {
+void Draw(Segment segment, std::ostream& os = std::cerr) {
+  for(int i = 0; i < segment.start; i++) {
+    os << "  ";
+  }
+  for(int i = segment.start; i < segment.end; i++) {
+    os << "==";
+  }
+}
+
+vector<int> optimal_points_attempt_2(vector<Segment> segments) {
   vector<int> points;
   //write your code here
-  
+
   std::vector<int> left_ends; left_ends.reserve(segments.size());
   for(size_t i = 0; i < segments.size(); i++) {
     left_ends.push_back(i);
@@ -105,6 +115,14 @@ vector<int> optimal_points_attempt_2(const vector<Segment> &segments) {
   [&segments](int lhs, int rhs) {
     return segments[lhs].start < segments[rhs].start;
   });
+#ifdef DEBUG
+  for(size_t i = 0; i < left_ends.size(); i++) {
+    std::cerr << std::setw(2) << std::setfill('0') << left_ends[i] << ": ";
+    Draw(segments[left_ends[i]]);
+    std::cerr << std::endl;
+  }
+  std::cerr << std::endl;
+#endif
 
   std::vector<int> right_ends; right_ends.reserve(segments.size());
   for(size_t i = 0; i < segments.size(); i++) {
@@ -114,15 +132,26 @@ vector<int> optimal_points_attempt_2(const vector<Segment> &segments) {
   [&segments](int lhs, int rhs) {
     return segments[lhs].end < segments[rhs].end;
   });
+#ifdef DEBUG
+  for(size_t i = 0; i < right_ends.size(); i++) {
+    std::cerr << std::setw(2) << std::setfill('0') << right_ends[i] << ": ";
+    Draw(segments[right_ends[i]]);
+    std::cerr << std::endl;
+  }
+  std::cerr << std::endl;
+#endif
 
   auto f_max_intersection = []
   (const std::vector<int>& left_ends, const std::vector<int>& right_ends, const vector<Segment> &segments) {
     std::set<int> res_intersection;
     int res_point = 0;
+    int prev_count = 0;
 
     std::set<int> intersection;
     size_t left_idx = 0; size_t right_idx = 0;
+#ifdef DEBUG
     std::cerr << "f_max_intersection start" << std::endl;
+#endif
     while(right_idx < right_ends.size()) {
       auto current_point = (left_idx < left_ends.size()) ? std::min(
         segments[left_ends[left_idx]].start, segments[right_ends[right_idx]].end + 1
@@ -134,11 +163,14 @@ vector<int> optimal_points_attempt_2(const vector<Segment> &segments) {
       while(right_idx < right_ends.size() && segments[right_ends[right_idx]].end + 1 == current_point) {
         intersection.erase(right_ends[right_idx++]);
       }
+#ifdef DEBUG
       std::cerr << current_point << ": " <<'[';
+
       for(int i : intersection) {
         std::cerr << i << ' ';
       }
       std::cerr << ']' << ' ' << intersection.size() << std::endl;
+#endif
       if(res_intersection.size() <= intersection.size()) {
         res_intersection = intersection;
         res_point = current_point;
@@ -172,6 +204,24 @@ vector<int> optimal_points_attempt_2(const vector<Segment> &segments) {
   return points;
 }
 
+vector<int> optimal_points_attempt_3(vector<Segment> segments) {
+  vector<int> points;
+
+  std::sort(segments.begin(),segments.end(),
+  [](auto lhs, auto rhs) {
+    return lhs.end < rhs.end;
+  });
+  
+  points.push_back(segments.begin()->end);
+  for(auto it = segments.begin(); it != segments.end(); it++) {
+    if(it->start > points.back()) {
+      points.push_back(it->end);
+    }
+  }
+
+  return points;
+}
+
 int main() {
 #if ENABLE_STRESS_TEST
   while (1)
@@ -195,34 +245,12 @@ int main() {
   }
 #endif
   int n;
-  std::stringstream ss;
-  ss << R"(19
-4 12
-2 3
-10 12
-5 13
-2 3
-4 11
-7 13
-10 11
-9 16
-9 18
-6 12
-6 7
-4 8
-8 14
-3 12
-6 14
-5 9
-4 9
-7 15
-)";
-  ss >> n;
+  std::cin >> n;
   vector<Segment> segments(n);
   for (size_t i = 0; i < segments.size(); ++i) {
-    ss >> segments[i].start >> segments[i].end;
+    std::cin >> segments[i].start >> segments[i].end;
   }
-  vector<int> points = optimal_points_attempt_2(segments);
+  vector<int> points = optimal_points_attempt_3(segments);
   std::cout << points.size() << "\n";
   for (size_t i = 0; i < points.size(); ++i) {
     std::cout << points[i] << " ";
