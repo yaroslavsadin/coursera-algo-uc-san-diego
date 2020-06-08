@@ -10,6 +10,8 @@ using std::string;
 
 string largest_number(vector<string> a) {
   //write your code here
+
+  // If a + b > b + a and b + c > c + b => a + c > c + a
   std::sort(a.begin(),a.end(),
   [](const auto& lhs, const auto& rhs){
     // gcc bug? segfault when using >=

@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Work/Coursera-Algo/part1_algorithmic_toolbox/week3_greedy_algorithms/7_maximum_salary/a.exe",
+            "program": "C:/Work/Coursera-Algo/part1_algorithmic_toolbox/week4_divide_and_conquer/3_improving_quicksort/a.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
