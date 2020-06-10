@@ -1,15 +1,81 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cassert>
 
 using std::vector;
+
+struct SegPoint {
+  enum class Type {
+    START, END
+  } type;
+  int value;
+};
+
+// Sweep line approach, O(nlogn) + O(mlogm)
+vector<int> fast_count_segments_take_two(const vector<int>& starts, const vector<int>& ends, vector<int> points) {
+  vector<int> cnt(points.size());
+  
+  std::vector<SegPoint> seg_points;
+  seg_points.reserve(starts.size()*2);
+  for(auto i : starts) {
+    seg_points.push_back({SegPoint::Type::START,i});
+  }
+  for(auto i : ends) {
+    seg_points.push_back({SegPoint::Type::END,i});
+  }
+  std::sort(seg_points.begin(),seg_points.end(),
+  [](auto lhs, auto rhs) {
+    return lhs.value < rhs.value;
+  });
+  
+  std::vector<size_t> points_idxs(points.size());
+  for(int i = 0; i < points.size(); i++) {
+    points_idxs[i] = i;
+  }
+  std::sort(points_idxs.begin(),points_idxs.end(),
+  [&points](auto lhs, auto rhs) {
+    return points[lhs] < points[rhs];
+  });
+
+  int counter = 0;
+  auto points_it = points_idxs.begin();
+  auto seg_points_it = seg_points.begin();
+  for(int i = std::min(points[*points_it],seg_points_it->value); 
+          points_it != points_idxs.end() && seg_points_it != seg_points.end();
+          i = std::min(points[*points_it],seg_points_it->value))
+  {
+    size_t num_starts = 0;
+    size_t num_ends = 0;
+    while(seg_points_it != seg_points.end() && i == seg_points_it->value) {
+      if(seg_points_it->type == SegPoint::Type::START) {
+        num_starts++;
+      } else {
+        num_ends++;
+      }
+      seg_points_it++;
+    }
+    counter += num_starts;
+    while(points_it != points_idxs.end() && i == points[*points_it]) {
+      cnt[*points_it] = counter;
+      points_it++;
+    }
+    counter -= num_ends;
+    if(points_it == points_idxs.end() || seg_points_it == seg_points.end()) {
+      break;
+    }
+  }
+  return cnt;
+}
+
+
 
 struct Segment {
   int start;
   int end;
 };
 
-/// XXX: for some reason iterative version is much slower
+// This is still O(n*m) but passes the grader!
 template<typename It>
 vector<int> fast_count_segments_impl(const vector<Segment>& segments_sorted_left, const vector<Segment>& segments_sorted_right, It points_begin, It points_end) {
   auto size_ = std::distance(points_begin,points_end);
@@ -45,7 +111,7 @@ vector<int> fast_count_segments_impl(const vector<Segment>& segments_sorted_left
   return cnt;
 }
 
-vector<int> fast_count_segments(vector<int> starts, vector<int> ends, vector<int> points) {
+vector<int> fast_count_segments_take_one(vector<int> starts, vector<int> ends, vector<int> points) {
   std::vector<Segment> segments_sorted_left(starts.size());
   for(size_t i = 0; i < segments_sorted_left.size(); i++) {
     segments_sorted_left[i] = {starts[i],ends[i]};
@@ -73,6 +139,35 @@ vector<int> naive_count_segments(vector<int> starts, vector<int> ends, vector<in
 }
 
 int main() {
+#if ENABLE_STRESS_TEST
+  while (1)
+  {
+      srand(static_cast<unsigned int>(time(nullptr)));
+      const auto n = (rand() % 50) + 1;
+      const auto m = (rand() % 60) + 1;
+      std::cerr << n << ' ' << m << std::endl;
+
+      vector<int> starts(n), ends(n);
+      for (size_t i = 0; i < starts.size(); i++) {
+        starts[i] = (rand() % 250) + 1;
+        ends[i] = starts[i] + (rand() % 250) + 1;
+        std::cerr << starts[i] << ' ' << ends[i] << std::endl;
+      }
+      vector<int> points(m);
+      for (size_t i = 0; i < points.size(); i++) {
+        points[i] = (rand() % 500) + 1;
+        std::cerr << starts[i] << ' ';
+      }
+      std::cerr << std::endl;
+
+      auto res_naive = naive_count_segments(starts, ends, points);
+      auto res = fast_count_segments_sweep_line(starts, ends, points);
+      
+      for(size_t i = 0; i < points.size(); i++) {
+        assert(res[i] == res_naive[i]);
+      }
+  }
+#endif
   int n, m;
   std::cin >> n >> m;
   vector<int> starts(n), ends(n);
@@ -84,7 +179,7 @@ int main() {
     std::cin >> points[i];
   }
   //use fast_count_segments
-  vector<int> cnt = fast_count_segments(starts, ends, points);
+  vector<int> cnt = fast_count_segments_take_two(starts, ends, points);
   for (size_t i = 0; i < cnt.size(); i++) {
     std::cout << cnt[i] << ' ';
   }
