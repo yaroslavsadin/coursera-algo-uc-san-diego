@@ -39,15 +39,6 @@ double minimal_distance_impl(It begin_, It end_) {
   std::vector<Point> y_sorted_l(begin_, middle);
   std::vector<Point> y_sorted_r(middle, end_);
   
-  std::sort(y_sorted_l.begin(),y_sorted_l.end(),
-  [](auto lhs, auto rhs){
-    return lhs.y < rhs.y;
-  });
-  std::sort(y_sorted_r.begin(),y_sorted_r.end(),
-  [](auto lhs, auto rhs){
-    return lhs.y < rhs.y;
-  });
-  
   size_t l_idx = 0;
   size_t r_idx = 0;
   for(auto it = y_sorted_l.begin(); it != y_sorted_l.end(); it++) {
@@ -79,7 +70,7 @@ double minimal_distance(const vector<int> x, vector<int> y) {
   }
   std::sort(points.begin(),points.end(),
   [](auto lhs, auto rhs){
-    return lhs.x < rhs.x;
+    return lhs.y < rhs.y;
   });
   return minimal_distance_impl(points.begin(), points.end());
 }
