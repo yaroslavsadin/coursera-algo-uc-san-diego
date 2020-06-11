@@ -15,9 +15,6 @@ using std::min;
 struct Point {
   int x;
   int y;
-  enum class Part {
-    LEFT, RIGHT
-  } part;
 };
 
 double calc_distance(Point lhs, Point rhs) {
@@ -27,34 +24,46 @@ double calc_distance(Point lhs, Point rhs) {
 template<typename It>
 double minimal_distance_impl(It begin_, It end_) {
   auto size_ = std::distance(begin_,end_);
-  assert(size_ >= 2);
+
   if(size_ == 2) {
     return calc_distance(*begin_, *std::next(begin_));
   }
+
   auto middle = begin_ + size_ / 2;
+
   auto min_ = std::min(
     minimal_distance_impl(begin_,(std::next(begin_) == middle) ? std::next(middle) : middle),
     minimal_distance_impl(middle,end_)
   );
-  std::vector<Point> y_sorted(begin_, end_);
-  for(size_t i = 0; i < y_sorted.size(); i++) {
-    if(i < std::distance(begin_, middle)) {
-      y_sorted[i].part = Point::Part::LEFT;
-    } else {
-      y_sorted[i].part = Point::Part::RIGHT;
-    }
-  }
-  std::sort(y_sorted.begin(),y_sorted.end(),
+
+  std::vector<Point> y_sorted_l(begin_, middle);
+  std::vector<Point> y_sorted_r(middle, end_);
+  
+  std::sort(y_sorted_l.begin(),y_sorted_l.end(),
   [](auto lhs, auto rhs){
     return lhs.y < rhs.y;
   });
-  for(size_t i = 0; i < y_sorted.size(); i++) {
-    size_t scanned = 0;
-    for(size_t j = i + 1; scanned < 7 && j < y_sorted.size(); j++) {
-      if(y_sorted[i].part != y_sorted[j].part) {
-        min_ = std::min(min_,calc_distance(y_sorted[i],y_sorted[j]));
-        scanned++;
-      }
+  std::sort(y_sorted_r.begin(),y_sorted_r.end(),
+  [](auto lhs, auto rhs){
+    return lhs.y < rhs.y;
+  });
+  
+  size_t l_idx = 0;
+  size_t r_idx = 0;
+  for(auto it = y_sorted_l.begin(); it != y_sorted_l.end(); it++) {
+    while(it->y > y_sorted_r[r_idx].y && r_idx < y_sorted_r.size()) {
+      r_idx++;
+    }
+    for(size_t i = 0; i < 7 && i + r_idx < y_sorted_r.size(); i++) {
+      min_ = std::min(min_,calc_distance(*it,y_sorted_r[r_idx + i]));
+    }
+  }
+  for(auto it = y_sorted_r.begin(); it != y_sorted_r.end(); it++) {
+    while(it->y > y_sorted_l[l_idx].y && l_idx < y_sorted_l.size()) {
+      l_idx++;
+    }
+    for(size_t i = 0; i < 7 && i + l_idx < y_sorted_l.size(); i++) {
+      min_ = std::min(min_,calc_distance(*it,y_sorted_l[l_idx + i]));
     }
   }
   return min_;
