@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Work/Coursera-Algo/part1_algorithmic_toolbox/week4_divide_and_conquer/6_closest_points/a.exe",
+            "program": "C:/Work/Coursera-Algo/part1_algorithmic_toolbox/week5_dynamic_programming1/longest_increasing_subsequence/a.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
