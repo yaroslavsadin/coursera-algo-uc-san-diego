@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Work/Coursera-Algo/part1_algorithmic_toolbox/week5_dynamic_programming1/2_primitive_calculator/a.exe",
+            "program": "C:/Work/Coursera-Algo/part1_algorithmic_toolbox/week5_dynamic_programming1/5_longest_common_subsequence_of_three_sequences/a.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
