@@ -22,13 +22,10 @@ int lcs3(vector<int> &a, vector<int> &b, vector<int> &c) {
         if(a[i-1] == b[j-1] && b[j-1] == c[k-1]) {
           dp_matrix[i][j][k] = dp_matrix[i-1][j-1][k-1] + 1;
         } else {
-          std::array<int,6> choices;
+          std::array<int,3> choices;
           choices[0] = dp_matrix[i][j][k-1];
           choices[1] = dp_matrix[i][j-1][k];
-          choices[2] = dp_matrix[i][j-1][k-1];
-          choices[3] = dp_matrix[i-1][j][k];
-          choices[4] = dp_matrix[i-1][j][k-1];
-          choices[5] = dp_matrix[i-1][j-1][k];
+          choices[2] = dp_matrix[i-1][j][k];
 
           dp_matrix[i][j][k] = *std::max_element(choices.begin(),choices.end());
         }
