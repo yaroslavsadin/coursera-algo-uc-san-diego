@@ -64,6 +64,9 @@
         "unordered_set": "cpp",
         "string_view": "cpp",
         "cassert": "cpp",
-        "optional": "cpp"
+        "optional": "cpp",
+        "stack": "cpp",
+        "deque": "cpp",
+        "queue": "cpp"
     }
 }
