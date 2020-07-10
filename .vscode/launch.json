@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Work/Coursera-Algo/part1_algorithmic_toolbox/week6_dynamic_programming2/2_partitioning_souvenirs/a.exe",
+            "program": "C:/Work/Coursera-Algo/part2_data_structures/week2_priority_queues_and_disjoint_sets/3_merging_tables/a.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

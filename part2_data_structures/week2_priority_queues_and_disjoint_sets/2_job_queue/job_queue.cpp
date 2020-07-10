@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
+#include <functional>
 
 using std::vector;
 using std::cin;
@@ -8,6 +10,11 @@ using std::cout;
 
 class JobQueue {
  private:
+  struct JobInProgress {
+    int worker;
+    long long finish_time;
+  };
+
   int num_workers_;
   vector<int> jobs_;
 
@@ -30,19 +37,35 @@ class JobQueue {
 
   void AssignJobs() {
     // TODO: replace this code with a faster algorithm.
-    assigned_workers_.resize(jobs_.size());
-    start_times_.resize(jobs_.size());
-    vector<long long> next_free_time(num_workers_, 0);
-    for (int i = 0; i < jobs_.size(); ++i) {
-      int duration = jobs_[i];
-      int next_worker = 0;
-      for (int j = 0; j < num_workers_; ++j) {
-        if (next_free_time[j] < next_free_time[next_worker])
-          next_worker = j;
+    assigned_workers_.reserve(jobs_.size());
+    start_times_.reserve(jobs_.size());
+    std::priority_queue<int,std::vector<int>,std::greater<int>> free_workers;
+    auto job_comp = [](JobInProgress lhs, JobInProgress rhs) { return lhs.finish_time > rhs.finish_time; };
+    std::priority_queue<JobInProgress,std::vector<JobInProgress>,decltype(job_comp)> jobs_in_progress(job_comp);
+    while(num_workers_--) {
+      free_workers.push(num_workers_);
+    }
+    std::queue<int> jobs_queue;
+    for(auto job : jobs_) {
+      jobs_queue.push(job);
+    }
+    
+    long long current_time = 0;
+    while(!jobs_queue.empty()) {
+      while(!jobs_in_progress.empty() && jobs_in_progress.top().finish_time <= current_time) {
+        auto job = jobs_in_progress.top(); jobs_in_progress.pop();
+        free_workers.push(job.worker);
       }
-      assigned_workers_[i] = next_worker;
-      start_times_[i] = next_free_time[next_worker];
-      next_free_time[next_worker] += duration;
+      long long next_time = (!jobs_in_progress.empty()) ? jobs_in_progress.top().finish_time : jobs_queue.front();
+      while(!free_workers.empty() && !jobs_queue.empty()) {
+        auto job_time = jobs_queue.front(); jobs_queue.pop();
+        auto worker = free_workers.top(); free_workers.pop();
+        assigned_workers_.push_back(worker);
+        start_times_.push_back(current_time);
+        jobs_in_progress.push({worker,current_time + job_time});
+        next_time = std::min(next_time, current_time + job_time);
+      }
+      current_time = next_time;
     }
   }
 
