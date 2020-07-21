@@ -49,7 +49,7 @@ void print_occurrences(const std::vector<int>& output) {
 
 std::vector<int> get_occurrences(const Data& input) {
     static const size_t multiplier = 263;
-    static const size_t prime = 2500000000000007;
+    static const size_t prime = 2500000000000343;
     const string& s = input.pattern, t = input.text;
     std::vector<int> ans;
     auto pHash = hash_func(s,prime,multiplier);
