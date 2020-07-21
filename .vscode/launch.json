@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Work/Coursera-Algo/part2_data_structures/week3_hash_tables/3_hash_substring/a.exe",
+            "program": "C:/Work/Coursera-Algo/part2_data_structures/week3_hash_tables/5_longest_common_substring/a.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
