@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Work/Coursera-Algo/part2_data_structures/week2_priority_queues_and_disjoint_sets/3_merging_tables/a.exe",
+            "program": "C:/Work/Coursera-Algo/part2_data_structures/week3_hash_tables/3_hash_substring/a.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

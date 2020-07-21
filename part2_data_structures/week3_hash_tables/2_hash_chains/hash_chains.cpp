@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <list>
 
 using std::string;
 using std::vector;
@@ -15,7 +16,7 @@ struct Query {
 class QueryProcessor {
     int bucket_count;
     // store all strings in one vector
-    vector<string> elems;
+    vector<std::list<string>> elems;
     size_t hash_func(const string& s) const {
         static const size_t multiplier = 263;
         static const size_t prime = 1000000007;
@@ -26,7 +27,7 @@ class QueryProcessor {
     }
 
 public:
-    explicit QueryProcessor(int bucket_count): bucket_count(bucket_count) {}
+    explicit QueryProcessor(int bucket_count): bucket_count(bucket_count), elems(bucket_count) {}
 
     Query readQuery() const {
         Query query;
@@ -44,21 +45,23 @@ public:
 
     void processQuery(const Query& query) {
         if (query.type == "check") {
-            // use reverse order, because we append strings to the end
-            for (int i = static_cast<int>(elems.size()) - 1; i >= 0; --i)
-                if (hash_func(elems[i]) == query.ind)
-                    std::cout << elems[i] << " ";
-            std::cout << "\n";
+            for(const auto& s : elems[query.ind]) {
+                std::cout << s << ' ';
+            }
+            std::cout << '\n';
         } else {
-            vector<string>::iterator it = std::find(elems.begin(), elems.end(), query.s);
-            if (query.type == "find")
-                writeSearchResult(it != elems.end());
-            else if (query.type == "add") {
-                if (it == elems.end())
-                    elems.push_back(query.s);
+            const auto& chain = elems[hash_func(query.s)];
+            auto it = std::find(chain.begin(),chain.end(),query.s);
+            if (query.type == "find") {
+               writeSearchResult(it != chain.end());
+            } else if (query.type == "add") {
+                if(it == chain.end()) {
+                    elems[hash_func(query.s)].push_front(query.s);
+                }
             } else if (query.type == "del") {
-                if (it != elems.end())
-                    elems.erase(it);
+                if(it != chain.end()) {
+                    elems[hash_func(query.s)].erase(it);
+                }
             }
         }
     }
