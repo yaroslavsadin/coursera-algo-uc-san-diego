@@ -12,7 +12,7 @@ struct Answer {
 };
 
 class Solver {
-	std::string s, t;
+	const std::string& s, t;
 	std::vector<long long> sh1, sh2;
 	std::vector<long long> th1, th2;
 	std::vector<long long> pows_1, pows_2;
@@ -28,7 +28,7 @@ class Solver {
 		return ((source[a+l] - pows_2[l] * source[a] % m2) + m2) % m2;
 	}
 public:	
-	Solver(string s, string t) : 
+	Solver(const string& s, const string& t) : 
 	s(s), t(t), sh1(s.size() + 1), sh2(s.size() + 1), th1(t.size() + 1), th2(t.size() + 1), 
 	pows_1(s.size() + 1), pows_2(s.size() + 1){	
 		// initialization, precalculation
@@ -54,22 +54,18 @@ public:
 		}
 	}
 	Answer ask(int l) {
-#ifdef DEBUG
-		std::cerr << "Length: " << l << ":\n";
-#endif
+		std::unordered_map<long long, int> hash_to_idx;
 		for(int i = 0; i + l <= s.size(); i++) {
 			auto sh1_ = GetSubstringHash1(i,l,sh1);
 			auto sh2_ = GetSubstringHash2(i,l,sh2);
-#ifdef DEBUG
-			std::cerr << "i: " << i << ", sh1: " << sh1_ << ", sh2: " << sh2_ << std::endl;
-#endif
-			for(int j = 0; j + l <= t.size(); j++) {
-#ifdef DEBUG
-				std::cerr << "j: " << j << ", th1: " << GetSubstringHash1(j,l,th1) << ", th2: " << GetSubstringHash2(j,l,th2) << std::endl;
-#endif
-				if(sh1_ == GetSubstringHash1(j,l,th1) && sh2_ == GetSubstringHash2(j,l,th2)) {
-					return {i,j,l};
-				}
+			hash_to_idx[sh1_] = i;
+			hash_to_idx[sh2_] = i;
+		}
+		for(int i = 0; i + l <= t.size(); i++) {
+			auto th1_ = GetSubstringHash1(i,l,th1);
+			auto th2_ = GetSubstringHash2(i,l,th2);
+			if(hash_to_idx.count(th1_) && hash_to_idx.count(th2_)) {
+				return {hash_to_idx.at(th1_),i,l};
 			}
 		}
 		return {0,0,0};
@@ -78,15 +74,23 @@ public:
 
 Answer solve(const string &s, const string &t) {
 	Solver solver(s,t);
-	auto max_len = std::min(s.size(),t.size());
-	Answer ans{0,0,0};
-	for(int l = 1; l <= max_len; l++) {
-		auto candidate = solver.ask(l);
-		if(candidate.len > 0) {
-			ans = candidate;
+	auto low = 0;
+	auto high = std::min(s.size(),t.size())+1;
+	Answer res = {0,0,0};
+	while (high - low > 1) {
+		int len = (low + high) / 2;
+#ifdef DEBUG
+		std::cerr << "High: " << high << ", Low: " << low << ", Len: " << len << std::endl;
+#endif
+		if(auto candidate = solver.ask(len); candidate.len > 0) {
+			res = (candidate.len > res.len) ? candidate : res;
+			low = len;
+		} else {
+			high = len;
 		}
 	}
-	return ans;
+	
+	return res;
 }
 
 int main() {
