@@ -49,10 +49,13 @@ public:
 	}
 	bool compare_substrings(int a, int b, int l) const {
 		auto res = (
-			((sh1[a+l] - pows_1[l] * sh1[a] % m1) + m1) % m1 == ((th1[a+l] - pows_1[l] * th1[a] % m1) + m1) % m1
+			((sh1[a+l] - pows_1[l] * sh1[a] % m1) + m1) % m1 == ((th1[b+l] - pows_1[l] * th1[b] % m1) + m1) % m1
 			&&
-			((sh1[b+l] - pows_1[l] * sh1[b] % m1) + m1) % m1 == ((th1[b+l] - pows_1[l] * th1[b] % m1) + m1) % m1
+			((sh2[a+l] - pows_2[l] * sh2[a] % m2) + m2) % m2 == ((th2[b+l] - pows_2[l] * th2[b] % m2) + m2) % m2
 		);
+#ifdef DEBUG
+		assert((s.substr(a, l) == s.substr(b, l)) == res);
+#endif
 		return res;
 	}
 
@@ -65,12 +68,21 @@ public:
 };
 
 std::pair<int,int> find_next_mismatch(const StringHasher& hasher, int pos_text, int pos_pattern, int len) {
-	for(int i = 0; i < len; i++) {
-		if(hasher.get_s()[pos_text+i] != hasher.get_t()[pos_pattern+i]) {
-			return std::make_pair(pos_text + i, pos_pattern + i);
+	int left = 0;
+	int right = len + 1;
+	while(right - left > 1) {
+		int middle = (right + left) / 2;
+#ifdef DEBUG
+			std::cerr << "find_next_mismatch: " << hasher.get_s().substr(pos_text,middle) 
+			<< ' ' << hasher.get_t().substr(pos_pattern,middle) << std::endl;
+#endif
+		if(hasher.compare_substrings(pos_text, pos_pattern, middle)) {
+			left = middle;
+		} else {
+			right = middle;
 		}
 	}
-	return {-1,-1};
+	return (left == len) ? std::make_pair(-1,-1) : std::make_pair(pos_text + left, pos_pattern + left);	
 }
 
 vector<int> solve(int k, const string &text, const string &pattern) {
@@ -93,7 +105,7 @@ vector<int> solve(int k, const string &text, const string &pattern) {
 				break;
 			} else {
 #ifdef DEBUG
-			std::cerr << "Mismatche: " << positions.first << ' ' << positions.second << std::endl;
+			std::cerr << "Mismatch: " << positions.first << ' ' << positions.second << std::endl;
 #endif
 				len -= positions.first + 1 - pos_text;
 				pos_text = positions.first + 1;
