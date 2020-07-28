@@ -16,6 +16,35 @@ class TreeOrders {
   vector <int> left;
   vector <int> right;
 
+  /// XXX: stack overflow on cygwin
+  void in_order_recurse(int node_id, vector<int>& result) {
+    if(left[node_id] != -1) {
+      in_order_recurse(left[node_id],result);
+    }
+    result.push_back(key[node_id]);
+    if(right[node_id] != -1) {
+      in_order_recurse(right[node_id],result);
+    }
+  }
+  void pre_order_recurse(int node_id, vector<int>& result) {
+    result.push_back(key[node_id]);
+    if(left[node_id] != -1) {
+      pre_order_recurse(left[node_id],result);
+    }
+    if(right[node_id] != -1) {
+      pre_order_recurse(right[node_id],result);
+    }
+  }
+  void post_order_recurse(int node_id, vector<int>& result) {
+    if(left[node_id] != -1) {
+      post_order_recurse(left[node_id],result);
+    }
+    if(right[node_id] != -1) {
+      post_order_recurse(right[node_id],result);
+    }
+    result.push_back(key[node_id]);
+  }
+
 public:
   void read() {
     cin >> n;
@@ -27,28 +56,33 @@ public:
     }
   }
 
-
   vector <int> in_order() {
     vector<int> result;
+    result.reserve(key.size());
     // Finish the implementation
     // You may need to add a new recursive method to do that
+    in_order_recurse(0,result);
 
     return result;
   }
 
   vector <int> pre_order() {
-    vector<int> result;    
+    vector<int> result;
+    result.reserve(key.size());
     // Finish the implementation
     // You may need to add a new recursive method to do that
+    pre_order_recurse(0,result);
     
     return result;
   }
 
   vector <int> post_order() {
     vector<int> result;
+    result.reserve(key.size());
     // Finish the implementation
     // You may need to add a new recursive method to do that
-    
+    post_order_recurse(0,result);
+
     return result;
   }
 };
