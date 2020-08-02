@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Work/Coursera-Algo/part2_data_structures/week3_hash_tables/6_matching_with_mismatches/a.exe",
+            "program": "C:/Work/Coursera-Algo/part2_data_structures/week4_binary_search_trees/4_set_range_sum/a.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

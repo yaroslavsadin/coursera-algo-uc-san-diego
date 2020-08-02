@@ -1,4 +1,8 @@
 #include <cstdio>
+#include <set>
+#include <cstdlib>
+#include <ctime>
+#include <cassert>
 
 // Splay tree implementation
 
@@ -159,13 +163,22 @@ void insert(int x) {
 
 void erase(int x) {                   
   // Implement erase yourself
-
+  auto* found = find(root, x);
+  if(found == root && root != nullptr && root->key == x) {
+    if(root->left != nullptr)  
+      root->left->parent = nullptr;
+    if(root->right != nullptr)
+      root->right->parent = nullptr;
+    auto* temp = merge(root->left,root->right);
+    delete root;
+    root = temp;
+  }
 }
 
 bool find(int x) {  
   // Implement find yourself
-
-  return false;
+  auto* vertex = find(root,x);
+  return (vertex != nullptr && vertex->key == x);
 }
 
 long long sum(int from, int to) {
@@ -174,15 +187,76 @@ long long sum(int from, int to) {
   Vertex* right = NULL;
   split(root, from, left, middle);
   split(middle, to + 1, middle, right);
-  long long ans = 0;
+  long long ans = (middle != nullptr) ? middle->sum : 0ll;
   // Complete the implementation of sum
-  
+  root = merge(merge(left,middle),right);
   return ans;  
+}
+
+std::set<int> slow_data;
+
+void insert_slow(int x) {
+  slow_data.insert(x);
+}
+
+void erase_slow(int x) {
+  slow_data.erase(x);
+}
+
+bool find_slow(int x) {
+  return (slow_data.find(x) != slow_data.end());
+}
+
+long long sum_slow(int from, int to) {
+  auto it = slow_data.lower_bound(from);
+  long long acc = 0;
+  while(it != slow_data.end() && *it <= to) {
+    acc += *it++;
+  }
+  return acc;
 }
 
 const int MODULO = 1000000001;
 
 int main(){
+#ifdef ENABLE_STRESS_TEST
+  srand(static_cast<unsigned int>(time(nullptr)));
+  int last_sum_result_slow = 0;
+  int last_sum_result_fast = 0;
+  while (1) {
+    auto type = std::rand() % 4;
+    switch (type) {
+      case 0 : {
+        printf("INSERT\n");
+        int x = std::rand() % 1000;
+        insert_slow((x + last_sum_result_slow) % MODULO);
+        insert((x + last_sum_result_fast) % MODULO);
+      } break;
+      case 1 : {
+        printf("ERASE\n");
+        int x = std::rand() % 1000;
+        erase_slow((x + last_sum_result_slow) % MODULO);
+        erase((x + last_sum_result_fast) % MODULO);
+      } break;            
+      case 2 : {
+        printf("FIND\n");
+        int x = std::rand() % 1000;
+        assert(find_slow((x + last_sum_result_slow) % MODULO) == find((x + last_sum_result_fast) % MODULO));
+      } break;
+      case 3 : {
+        printf("SUM\n");
+        int l, r;
+        l = std::rand();
+        r = std::rand() % 999;
+        auto _slow = sum_slow((l + last_sum_result_slow) % MODULO, (r + last_sum_result_slow) % MODULO);
+        auto _fast = sum((l + last_sum_result_fast) % MODULO, (r + last_sum_result_fast) % MODULO);
+        assert(_slow == _fast);
+        last_sum_result_slow = int(_slow % MODULO);
+        last_sum_result_fast = int(_fast % MODULO);
+      }
+    }
+  }
+#endif
   int n;
   scanf("%d", &n);
   int last_sum_result = 0;
